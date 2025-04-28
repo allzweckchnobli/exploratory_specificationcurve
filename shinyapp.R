@@ -3,13 +3,9 @@ library(dplyr)
 library(ggplot2)
 library(rlang)
 library(patchwork)
+library(shinythemes)
+library(shinyjs)
 
-# Example data (you can replace this with your CSV)
-data <- data.frame(
-  x = rnorm(100),
-  y = rnorm(100),
-  type = sample(c("All", "All vs. All", "One vs. All", "One vs. One"), 100, replace = TRUE)
-)
 
 data <- read.csv("plotdata_final.csv")
 
@@ -38,10 +34,13 @@ helper_measures <- data.frame(
 )
 
 ui <- fluidPage(
+  useShinyjs(),
+  theme = shinytheme("cosmo"),
   titlePanel("Exploratory visualization of Specification Curve"),
   
   sidebarLayout(
     sidebarPanel(
+      style = "background-color: #e9ecf5;",
       radioButtons(
         "primary_measure",
         "Select primary Measure:",
@@ -101,10 +100,24 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      plotOutput("filtered_plot"),
-      textOutput("test"),
-      downloadButton("download_csv", "Download CSV")
+      downloadButton("download_csv", "Download Measures", disabled = TRUE),
+      plotOutput("filtered_plot",height="600px"),
+      textOutput("test")
+      
     )
+  ),
+  tags$footer(
+    style = "
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #f8f9fa;
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #6c757d;
+    ",
+    "[Licence] Sabou Rani Stocker - Source Code available on GitHub."
   )
 )
 
@@ -138,6 +151,9 @@ server <- function(input, output, session) {
     req(input$filter_preprocessing)
     req(input$filter_mechanism)
     
+    # Activate Download Button 
+    shinyjs::enable("download_csv")
+
     ## Filter according to specifications
     filtered <- data
   
