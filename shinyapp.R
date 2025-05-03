@@ -100,7 +100,23 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      downloadButton("download_csv", "Download Measures", disabled = TRUE),
+      p(HTML("
+      This shiny app invites you to <b>explore the findings</b> of our study investigating the effectiveness of Natural Language Processing (NLP) techniques in classifying verbal reports based on underlying psychological mechanisms influencing decision-making under risk and uncertainty. It does so by systematically evaluating a specification curve based on 585 unique models across four mechanisms, using AUC-ROC as a performance measure and standardized entropy (h-scores, see Tornetta, <a href='http://arxiv.org/abs/2103.15157'>2021</a>) to assess classification confidence. 
+      <br>
+      Using think-aloud protocols collected from an experimental between-subjects design (n = 320), we tested four hypothesized mechanisms across 585 unique model configurations, evaluating both classification performance and confidence. These mechanisms were derived from a recently developed taxonomy of state-specific mechanisms influencing decisions under risk and uncertainty (Lob et al., <a href='https://osf.io/preprints/psyarxiv/a73y4_v1'>2025</a>).
+      <br>
+      <div class='alert alert-info' role='alert'>
+        <strong>Explanation of Usage</strong> <br>
+        The left panel provides you all possible 
+      </div>
+      </div>
+      
+      ")),
+      div(
+        class = "text-right",
+        downloadButton("download_csv", "Download Measures", disabled = TRUE, class = "btn btn-sm btn-primary")
+      ),
+      
       plotOutput("filtered_plot",height="600px"),
       textOutput("test")
       
@@ -118,7 +134,13 @@ ui <- fluidPage(
       color: #6c757d;
     ",
     "[Licence] Sabou Rani Stocker - Source Code available on GitHub."
-  )
+  ),
+
+  tags$style(HTML("
+    .container-fluid {
+      padding-bottom: 60px; 
+    }
+  "))
 )
 
 server <- function(input, output, session) {
@@ -171,12 +193,18 @@ server <- function(input, output, session) {
     }
   
     if (!"All" %in% input$filter_spec_ds) {
-      filtered <- filtered %>% filter(specification %in% input$filter_spec_ds)
+      filtered_ds <- filtered %>% filter(specification %in% input$filter_spec_ds)
+    } else {
+      filtered_ds <- filtered %>% filter(specification %in% c("Definitions","Examples","Both"))
     }
   
     if (!"All" %in% input$filter_spec_other) {
-      filtered <- filtered %>% filter(specification %in% input$filter_spec_other)
+      filtered_other <- filtered %>% filter(specification %in% input$filter_spec_other)
+    } else {
+      filtered_other <- filtered %>% filter(specification %in% c("CLS","MEAN","MAX"))
     }
+
+    filtered <- rbind(filtered_ds,filtered_other)
   
     if (!"All" %in% input$filter_preprocessing) {
       filtered <- filtered %>% filter(preprocessing %in% input$filter_preprocessing)

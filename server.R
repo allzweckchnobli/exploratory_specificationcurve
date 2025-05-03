@@ -5,7 +5,7 @@ library(rlang)
 library(patchwork)
 library(shinythemes)
 
-function(input, output, session) {
+server <- function(input, output, session) {
   
   observe({
       selected <- input$filter_type
@@ -22,6 +22,13 @@ function(input, output, session) {
         }
       }
     })
+  
+  observeEvent(input$explore_results, {
+    updateTabsetPanel(session, "main_tabs", selected = "Explore") 
+  })
+  observeEvent(input$more_info, {
+    updateTabsetPanel(session, "main_tabs", selected = "In more Detail") 
+  })
     
 
 filtered_data <- eventReactive(input$submit, {
@@ -35,6 +42,10 @@ filtered_data <- eventReactive(input$submit, {
   req(input$filter_preprocessing)
   req(input$filter_mechanism)
   
+  # Activate Download Button 
+  shinyjs::enable("download_csv")
+  shinyjs::enable("download_plot_svg")
+
   ## Filter according to specifications
   filtered <- data
 
@@ -52,12 +63,18 @@ filtered_data <- eventReactive(input$submit, {
   }
 
   if (!"All" %in% input$filter_spec_ds) {
-    filtered <- filtered %>% filter(specification %in% input$filter_spec_ds)
+    filtered_ds <- filtered %>% filter(specification %in% input$filter_spec_ds)
+  } else {
+    filtered_ds <- filtered %>% filter(specification %in% c("Definitions","Examples","Both"))
   }
 
   if (!"All" %in% input$filter_spec_other) {
-    filtered <- filtered %>% filter(specification %in% input$filter_spec_other)
+    filtered_other <- filtered %>% filter(specification %in% input$filter_spec_other)
+  } else {
+    filtered_other <- filtered %>% filter(specification %in% c("CLS","MEAN","MAX"))
   }
+
+  filtered <- rbind(filtered_ds,filtered_other)
 
   if (!"All" %in% input$filter_preprocessing) {
     filtered <- filtered %>% filter(preprocessing %in% input$filter_preprocessing)
@@ -320,14 +337,13 @@ output$filtered_plot <- renderPlot({
 
   if(!is.na(smeasure)) {
     heights <- append(c(2, 1.5, 1, 1), c(n_specs, 1, n_comp))
-    plot <- p_primary_measure / p_secondary_measure / p_dataverse / p_classifier / specs / p_preprocessing / p_comparisons + plot_layout(heights = heights)
+    finalplot <<- p_primary_measure / p_secondary_measure / p_dataverse / p_classifier / specs / p_preprocessing / p_comparisons + plot_layout(heights = heights)
   }
   else {
     heights <- append(c(2, 1, 1), c(n_specs, 1, n_comp))
-    plot <- p_primary_measure / p_dataverse / p_classifier / specs / p_preprocessing / p_comparisons + plot_layout(heights = heights)
+    finalplot <<- p_primary_measure / p_dataverse / p_classifier / specs / p_preprocessing / p_comparisons + plot_layout(heights = heights)
   }
-  
-  plot
+  finalplot
 })
 
 output$test <- renderText({
@@ -348,6 +364,18 @@ output$download_csv <- downloadHandler(
     
     # Save the data to a CSV file
     write.csv(df, file, row.names = FALSE)
+  }
+)
+
+output$download_plot_svg <- downloadHandler(
+  filename = function() {
+    paste0("filtered_plot_", Sys.Date(), ".svg")
+  },
+  content = function(file) {
+    # Use svg device to write to file
+    svg(filename = file, width = 16, height = 9)  # 16:9 inches
+    print(finalplot)  # assumes filtered_plot() is your ggplot object
+    dev.off()
   }
 )
 }
