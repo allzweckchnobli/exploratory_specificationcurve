@@ -26,6 +26,9 @@ server <- function(input, output, session) {
   observeEvent(input$explore_results, {
     updateTabsetPanel(session, "main_tabs", selected = "Explore") 
   })
+  observeEvent(input$explore_results_2, {
+    updateTabsetPanel(session, "main_tabs", selected = "Explore") 
+  })
   observeEvent(input$more_info, {
     updateTabsetPanel(session, "main_tabs", selected = "In more Detail") 
   })

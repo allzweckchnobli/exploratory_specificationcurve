@@ -5,7 +5,9 @@ library(rlang)
 library(patchwork)
 library(shinythemes)
 
-ui <- navbarPage("",
+ui <- div(
+  style = "padding-bottom: 80px;",
+  navbarPage("",
   id = "main_tabs",
   # Footer shown on every page
   footer = div(
@@ -22,6 +24,7 @@ ui <- navbarPage("",
         p("Footer content goes here")
   ),
   useShinyjs(),
+
   tabPanel("About this App",
     div(
       class = "container mt-5 mb-5",
@@ -42,23 +45,220 @@ ui <- navbarPage("",
       )
     )
   ),
+  
   tabPanel("In more Detail",
-  div(class = "container mt-5 mb-5",
-    h2("Methodology and Measures"),
-    h3("Model Choice and Model Specifications"), 
-    h3("Data Preselection Strategy"),
-    h3("Comparison Type"),
-    h3("Mechanisms"),
-    p(HTML("The mechanisms that inspired the study were identified in Lob et al. (<a href='https://osf.io/preprints/psyarxiv/a73y4_v1'>2025</a>)."),style = "font-size: 20px;"),
-    h2("Evaluation Metrics"),
-    h3("AUC-ROC"),
-    h3("h-Score"),
-    h3("Accuracy")
-  )
-),
+    div(
+      class = "container mt-5 mb-5",
+      h2("Methodology and Measures"),
+      tags$div(
+        class = "panel panel-primary",
+        style = "border: none !important",
+        
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "Model Choice and Model Specifications",
+              "data-toggle" = "collapse",
+              "href" = "#collapseModelSpecs",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapseModelSpecs",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            div(
+              style = "text-align: center;",
+              tags$img(src = "model_config.svg", style = "width: 50%; ")
+            ),
+            p(HTML("
+            The model configurations are based on two LLM architectures: Deepseek R1 (671b model accessed via API), and SBERT. Deepseek R1 was prompted with three types of prompts: Definitions of the mechanisms, examples of TAPs stemming from each mechanism, and prompts consisting of both. All other classifiers were based on SBERT embeddings either derived from CLS pooling, MEAN pooling, or MAX pooling (for details on the pooling strategies and their impacts, see Reimers and Gurevych, <a href = 'https://arxiv.org/abs/1908.10084'>2019</a>). Random Forest classifiers were trained and tested on the embeddings derived from each TAP; Top-5 Similarity were based on a dictionary approach comparing each TAP to a dictionary of tagged samples, and deriving the top-5 most similar samples; Mean-Top-5 + Random Forest averaged the embeddings of the TAP and the five most similar TAPs to enhance shared features, and subsequently trained and evaluated a Random Forest classifier.
+            <br>
+            Data used to create embeddings for all SBERT based classifiers was either not pre-processed, pre-processed by removing stopwords and lowercasing; normalized by stemming and lemmatizing, or normalized and additionally removing the top 200 shared words.
+            "), style = "font-size: 16px;")
+          )
+        ), 
+
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "Data Preselection Strategy",
+              "data-toggle" = "collapse",
+              "href" = "#collapseDataPreselection",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapseDataPreselection",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            tags$img(src = "data_preselection_strategy.svg", style = "width: 100%;"),
+            p(HTML("
+            Data preselection strategy referrs to the participants included in and excluded from the classification. No data preselection (<i>Full Data</i>) indicates that no participants were excluded from analysis. Data preselection strategies referring to <i>Ground Truth different from...</i> indicate that only participants who reported to perceive a measure outside of the 90%-percentile of the baseline group perception (or all other groups respectively) <i>and</i> who were assigned to the condition they perceived to report were included. <i>Self Report different from... </i> conditions are based on the same selection strategy, but the ground-truth condition assigned was not considered.
+            "), style = "font-size: 16px;")
+          )
+        ), 
+
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "Comparison Type",
+              "data-toggle" = "collapse",
+              "href" = "#collapseComparison",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapseComparison",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            tags$img(src = "comparison_type_long.svg", style = "width: 100%;"),
+            p(HTML("
+            The three comparison types evaluated are binary comparisons (<i>One vs. One</i>), one-vs-rest-comparisons (<i>One vs. All</i>), and multi-class-comparisons (<i>All vs. All</i>). The probabilities for each class as illustrated in the visualization are the probabilities underlying the AUC-ROC and h-score distribution. For accuracy, the mechanism with highest probability was valued as the positive class.
+            "), style = "font-size: 16px;")
+          )
+        ), 
+
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "Mechanisms",
+              "data-toggle" = "collapse",
+              "href" = "#collapseMechanism",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapseMechanism",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            p(HTML("
+            The four mechanisms evaluated were <i>Baseline Condition</i> manipulating choice attributes; <i>Social Norms</i>, <i>Knowledge</i>, and <i>Need</i>. These mechanisms and their presumed influence on decision-making were not identified in this study, but in previous work (see Lob et al., <a href='https://osf.io/preprints/psyarxiv/a73y4_v1'>2025</a>). These endeavors also resulted in a mechanism-explorer much more elaborate than the shiny-app at hand, which can be found under <a href='https://explorer.cbdr-lab.net/'>https://explorer.cbdr-lab.net/</a>.
+            "), style = "font-size: 16px;")
+          )
+        )
+      ),
+
+      h2("Evaluation Metrics"),
+      tags$div(
+        class = "panel panel-primary",
+        style = "border: none !important",
+        
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "AUC-ROC",
+              "data-toggle" = "collapse",
+              "href" = "#collapseAucRoc",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapseAucRoc",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            p(HTML("
+            The <i>area under the curve</i> for the <i>receiver-operator-characteristic</i> refers to the area under the curve when the true positive and the false positive rate are plotted against each other for various thressholds between 0 and 1. It is a measure fitting to assess both specificity and sensitivity of any given classifier, as both considerations are taken into account. AUC-ROC values of ~0.5 indicate a classifier as good as chance, AUC-ROC values of ~0.7 are generally accepted as adequate, values ~0.8 or higher as excellent, and values ~0.9 or higher as outstanding (see for example Hosmer, & Lemeshow, 2000).
+            "), style = "font-size: 16px;")
+          )
+        ), 
+
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "h-Scores",
+              "data-toggle" = "collapse",
+              "href" = "#collapsehScore",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapsehScore",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            p(HTML("
+            h-Scores are a standardized measure for the typically used measure of <i>entropy</i> (see Tornetta, <a href='http://arxiv.org/abs/2103.15157'>2021</a>), and can assume values between 0 and 1, wherein a value of 0 means that a classifier cannot distinguish between alternatives, whereas a h-score of 1 indicates that a classifier distinguishes between alternatives with 100% confidence. It is important to note that high confidence in classification does not imply high performance of the classifier, although the results in this study display a moderate correlation between h-scores and AUC-ROC"), style = "font-size: 16px;")
+          )
+        ), 
+
+        tags$div(
+          class = "panel-heading",
+          style = "margin-bottom: 2px;",
+          tags$h4(
+            class = "panel-title",
+            tags$a(
+              "Accuracy",
+              "data-toggle" = "collapse",
+              "href" = "#collapseAccuracy",
+              "aria-expanded" = "false"
+            )
+          )
+        ),
+        
+        tags$div(
+          id = "collapseAccuracy",
+          class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
+          tags$div(
+            class = "panel-body",
+            p(HTML("
+            While Accuracy is not a primary measure reported in this study due to its risk of being over-optimistic in unbiased datasets, it is a frequently used measure in machine learning, and therefore a filter option in this explorer. Accuracy is the percentage of correctly identified instances by all instances, or in other words the sum of true negatives and true positives divided by the sum of true negatives, true positives, false negatives and false positives of a class.
+            "), style = "font-size: 16px;")
+          )
+        )
+      ),
+      div(class = "text-center", 
+      actionButton("explore_results_2", "Explore Results",class="btn btn-primary btn-lg"),
+      )
+    )
+
+  ),
+
   tabPanel("Explore",
     div(class = "container mt-5 mb-5",
       h2("Explore"),
+      fluidRow(
+        column(12,
+        div(
+          class = "alert alert-info",
+          p(HTML("Select the combination of specifications you want to display by chosing from the menu below, or leave the defaults to visualize the full specification curve. When you are done with your selection, press <b>Generate Plot</b> to generate a full specification curve. Once the specification curve is generated, you can download the plot in .svg format as well as the raw measures in .csv format."))
+        )
+      )),
       fluidRow(
           column(2, 
               radioButtons(
@@ -131,7 +331,8 @@ ui <- navbarPage("",
         column(12,
           div(class = "text-center",
           p("Chose from the selection of specifications in the menu above and press submit to generate a specification curve."),
-          actionButton("submit", "Submit Selection")
+          p(HTML("<i><b>Important:</b> It may take a couple of seconds for the plot to generate. Please be patient, this shiny app is working hard.</i>")),
+          actionButton("submit", "Generate Plot",class="btn btn-success btn-lg")
           )
         )
       ),
@@ -147,6 +348,6 @@ ui <- navbarPage("",
             textOutput("test")
           )
       )
-  ),
+    )
   )
-)
+))
