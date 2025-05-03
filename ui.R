@@ -21,7 +21,7 @@ ui <- div(
             font-size: 12px;
             color: #6c757d;
           ",
-        p(HTML("Specification Curve for NLP Classifiers | Contact: <a href='mailto:sabourani.stocker@uzh.ch'>Sabou Rani Stocker</a> | <a href = 'https://www.psychology.uzh.ch/en/areas/nec/cogres.html'>CBDR</a> | Source code: <a href='https://github.com/allzweckchnobli/overfittingsimulation' target='_blank'> <i class='fab fa-github' role='presentation' aria-label='github icon'></i> </a>"))
+        p(HTML("Specification Curve for NLP Classifiers | Contact: <a href='mailto:sabourani.stocker@uzh.ch'>Sabou Rani Stocker</a> | <a href = 'https://www.psychology.uzh.ch/en/areas/nec/cogres.html'>CBDR</a> | Source code: <a href='https://github.com/allzweckchnobli/exploratory_specificationcurve' target='_blank'> <i class='fab fa-github' role='presentation' aria-label='github icon'></i> </a>"))
   ),
   useShinyjs(),
 
