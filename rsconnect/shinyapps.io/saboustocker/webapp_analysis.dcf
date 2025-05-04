@@ -1,0 +1,10 @@
+name: webapp_analysis
+title:
+username: saboustocker
+account: saboustocker
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14677778
+bundleId: 10227113
+url: https://saboustocker.shinyapps.io/webapp_analysis/
+version: 1

@@ -8,6 +8,7 @@ library(shinythemes)
 ui <- div(
   style = "padding-bottom: 80px;",
   navbarPage("",
+  theme = shinytheme("sandstone"),
   id = "main_tabs",
   # Footer shown on every page
   footer = div(
@@ -75,7 +76,7 @@ ui <- div(
             class = "panel-body",
             div(
               style = "text-align: center;",
-              tags$img(src = "model_config.svg", style = "width: 50%; ")
+              tags$img(src = "model_config.svg", style = "width: 50%;  background-color: white;")
             ),
             p(HTML("
             The model configurations are based on two LLM architectures: Deepseek R1 (671b model accessed via API), and SBERT. Deepseek R1 was prompted with three types of prompts: Definitions of the mechanisms, examples of TAPs stemming from each mechanism, and prompts consisting of both. All other classifiers were based on SBERT embeddings either derived from CLS pooling, MEAN pooling, or MAX pooling (for details on the pooling strategies and their impacts, see Reimers and Gurevych, <a href = 'https://arxiv.org/abs/1908.10084'>2019</a>). Random Forest classifiers were trained and tested on the embeddings derived from each TAP; Top-5 Similarity were based on a dictionary approach comparing each TAP to a dictionary of tagged samples, and deriving the top-5 most similar samples; Mean-Top-5 + Random Forest averaged the embeddings of the TAP and the five most similar TAPs to enhance shared features, and subsequently trained and evaluated a Random Forest classifier.
@@ -104,7 +105,7 @@ ui <- div(
           class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
           tags$div(
             class = "panel-body",
-            tags$img(src = "data_preselection_strategy.svg", style = "width: 100%;"),
+            tags$img(src = "data_preselection_strategy.svg", style = "width: 100%;  background-color: white;"),
             p(HTML("
             Data preselection strategy referrs to the participants included in and excluded from the classification. No data preselection (<i>Full Data</i>) indicates that no participants were excluded from analysis. Data preselection strategies referring to <i>Ground Truth different from...</i> indicate that only participants who reported to perceive a measure outside of the 90%-percentile of the baseline group perception (or all other groups respectively) <i>and</i> who were assigned to the condition they perceived to report were included. <i>Self Report different from... </i> conditions are based on the same selection strategy, but the ground-truth condition assigned was not considered.
             "), style = "font-size: 16px;")
@@ -130,7 +131,7 @@ ui <- div(
           class = "panel-collapse collapse",  # start collapsed; add "in" to show by default
           tags$div(
             class = "panel-body",
-            tags$img(src = "comparison_type_long.svg", style = "width: 100%;"),
+            tags$img(src = "comparison_type_long.svg", style = "width: 100%;  background-color: white;"),
             p(HTML("
             The three comparison types evaluated are binary comparisons (<i>One vs. One</i>), one-vs-rest-comparisons (<i>One vs. All</i>), and multi-class-comparisons (<i>All vs. All</i>). The probabilities for each class as illustrated in the visualization are the probabilities underlying the AUC-ROC and h-score distribution. For accuracy, the mechanism with highest probability was valued as the positive class.
             "), style = "font-size: 16px;")
@@ -256,7 +257,8 @@ ui <- div(
         column(12,
         div(
           class = "alert alert-info",
-          p(HTML("Select the combination of specifications you want to display by chosing from the menu below, or leave the defaults to visualize the full specification curve. When you are done with your selection, press <b>Generate Plot</b> to generate a full specification curve. Once the specification curve is generated, you can download the plot in .svg format as well as the raw measures in .csv format."))
+          p(HTML("Select the combination of specifications you want to display by chosing from the menu below, or leave the defaults to visualize the full specification curve. When you are done with your selection, press <b>Generate Plot</b> to generate a full specification curve. Once the specification curve is generated, you can download the plot in .svg format as well as the raw measures in .csv format. <br><br>
+          If you select the option <b>All</b> in any of the filters, additional filters will not be considered."))
         )
       )),
       fluidRow(

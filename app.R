@@ -6,8 +6,8 @@ library(patchwork)
 library(shinythemes)
 library(shinyjs)
 
-source("global.R")
-source("ui.R")
-source("server.R")
+source("global_file.R")
+source("ui_file.R")
+source("server_file.R")
 
 shinyApp(ui = ui, server = server)

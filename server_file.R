@@ -7,22 +7,6 @@ library(shinythemes)
 
 server <- function(input, output, session) {
   
-  observe({
-      selected <- input$filter_type
-      ## check if selected currently contains ALL 
-      
-      if (!is.null(selected)) {
-        if ("All" %in% selected && length(selected) > 1) {
-          # If "All" selected together with others -> keep only "All"
-          updateCheckboxGroupInput(
-            session,
-            "filter_type",
-            selected = "All"
-          )
-        }
-      }
-    })
-  
   observeEvent(input$explore_results, {
     updateTabsetPanel(session, "main_tabs", selected = "Explore") 
   })
