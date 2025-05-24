@@ -5,6 +5,6 @@ account: saboustocker
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 14677778
-bundleId: 10227113
+bundleId: 10336334
 url: https://saboustocker.shinyapps.io/webapp_analysis/
 version: 1

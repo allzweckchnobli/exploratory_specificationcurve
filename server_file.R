@@ -37,22 +37,29 @@ filtered_data <- eventReactive(input$submit, {
   filtered <- data
 
   ## Then filter step-by-step
-  if (!"All" %in% input$filter_type) {
-    filtered <- filtered %>% filter(type %in% input$filter_type)
-  }
 
-  if (!"All" %in% input$filter_dataverse) {
-    filtered <- filtered %>% filter(dataverse %in% input$filter_dataverse)
-  }
+  default_count <- 0
 
-  if (!"All" %in% input$filter_classifier) {
-    filtered <- filtered %>% filter(classifier %in% input$filter_classifier)
+  filtered <- filtered %>% filter(type %in% input$filter_type)
+  if (setequal(input$filter_type, c("One vs. One", "One vs. All"))) {
+    default_count <- default_count + 1
   }
-
+  filtered <- filtered %>% filter(dataverse %in% input$filter_dataverse)
+  if (setequal(input$filter_dataverse, c("Full Data","GT different baseline","SR different baseline"))) {
+    default_count <- default_count + 1
+  }
+  filtered <- filtered %>% filter(classifier %in% input$filter_classifier)
+  if (setequal(input$filter_classifier, c("Deepseek R1","Mean Top-5 + Random Forest","Top-5 Similarity","Random Forest"))) {
+    default_count <- default_count + 1
+  }
+  
   if (!"All" %in% input$filter_spec_ds) {
     filtered_ds <- filtered %>% filter(specification %in% input$filter_spec_ds)
   } else {
     filtered_ds <- filtered %>% filter(specification %in% c("Definitions","Examples","Both"))
+  }
+  if (setequal(input$filter_spec_ds, c("Definitions","Examples","Both"))) {
+    default_count <- default_count + 1
   }
 
   if (!"All" %in% input$filter_spec_other) {
@@ -60,16 +67,26 @@ filtered_data <- eventReactive(input$submit, {
   } else {
     filtered_other <- filtered %>% filter(specification %in% c("CLS","MEAN","MAX"))
   }
+  if (setequal(input$filter_spec_other, "MEAN")) {
+    default_count <- default_count + 1
+  }
 
   filtered <- rbind(filtered_ds,filtered_other)
-
-  if (!"All" %in% input$filter_preprocessing) {
-    filtered <- filtered %>% filter(preprocessing %in% input$filter_preprocessing)
+  filtered <- filtered %>% filter(preprocessing %in% input$filter_preprocessing)
+  if (setequal(input$filter_preprocessing, c("None","Normalized","Pre-Processed","Top200"))) {
+    default_count <- default_count + 1
+  }
+  filtered <- filtered %>% filter(tested_class %in% input$filter_mechanism)
+  if (setequal(input$filter_mechanism, c("CA","SI","EN","GM"))) {
+    default_count <- default_count + 1
   }
 
-  if (!"All" %in% input$filter_mechanism) {
-    filtered <- filtered %>% filter(tested_class %in% input$filter_mechanism)
+  if(default_count == 7) {
+    defaults <- "YES"
+  } else {
+    defaults <- "NO"
   }
+
 
   if(input$primary_measure == "AUC-ROC") {
     filtered <- filtered %>% arrange(desc(aucroc))
@@ -77,6 +94,14 @@ filtered_data <- eventReactive(input$submit, {
     filtered <- filtered %>% arrange(desc(ent))
   } else if(input$primary_measure == "Accuracy") {
     filtered <- filtered %>% arrange(desc(accuracy))
+  }
+
+  if (defaults == "YES") {
+    filtered <- filtered %>%
+      filter(
+        (type != "One vs. One") |
+        (type == "One vs. One" & alternative_class == "CA")
+      )
   }
 
   filtered <- filtered %>% mutate(id = row_number())
@@ -95,6 +120,10 @@ filtered_data <- eventReactive(input$submit, {
     sd_smeasure <- NA
     pub_smeasure <- NA
   }
+
+  ## Check if the filters are the default ones
+  
+
 
   list(
     df = filtered,
@@ -117,6 +146,8 @@ output$filtered_plot <- renderPlot({
   smeasure <- filtered_data$smeasure
   sd_smeasure <- filtered_data$sd_smeasure
   n_id <- nrow(df)
+
+
 
   p_primary_measure <- ggplot(df, aes(x = id, y = !!sym(measure))) + 
     geom_errorbar(aes(ymin = !!sym(measure) - !!sym(sd_measure), ymax = !!sym(measure) + !!sym(sd_measure), color = "#E7E7E7"), 
